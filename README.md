@@ -1,3 +1,3 @@
 # wgpu-simu
 
-# Here is my project to learn wpgu
+# Here is my project to learn wgpu

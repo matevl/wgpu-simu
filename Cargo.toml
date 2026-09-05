@@ -4,3 +4,15 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+# Error handling & logging
+anyhow = "1.0"
+log = "0.4"
+env_logger = "0.11"
+
+# Windowing & runtime
+winit = "0.30"
+pollster = "1.0.1"
+
+# Graphics & Compute
+wgpu = "30.0.1"
+bytemuck = { version = "1.16", features = ["derive"] }
