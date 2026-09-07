@@ -1,5 +1,5 @@
 use crate::core::input::InputState;
-use crate::gfx::GpuContext;
+use crate::gfx::{GpuContext, pipeline::PipelineBuilder};
 use std::sync::Arc;
 use winit::{dpi::PhysicalSize, window::Window};
 
@@ -7,6 +7,7 @@ pub struct State {
     pub window: Arc<Window>,
     pub gpu: GpuContext,
     pub input: InputState,
+    render_pipeline: wgpu::RenderPipeline,
 }
 
 impl State {
@@ -14,7 +15,13 @@ impl State {
         let gpu = GpuContext::new(window.clone()).await?;
         let input = InputState::new();
 
-        Ok(Self { window, gpu, input })
+        let render_pipeline = PipelineBuilder::build_basic_pipeline(&gpu.device, gpu.config.format);
+        Ok(Self {
+            window,
+            gpu,
+            input,
+            render_pipeline,
+        })
     }
 
     pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
@@ -65,7 +72,7 @@ impl State {
 
     /// Records a render pass that clears the screen to a specific color.
     fn record_render_pass(&self, encoder: &mut wgpu::CommandEncoder, view: &wgpu::TextureView) {
-        let _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+        let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Render Pass"),
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                 view,
@@ -86,7 +93,9 @@ impl State {
             timestamp_writes: None,
             multiview_mask: None,
         });
-
         // TODO: Add render pipelines, bind groups, and draw calls for the simulation.
+
+        render_pass.set_pipeline(&self.render_pipeline);
+        render_pass.draw(0..3, 0..1);
     }
 }
